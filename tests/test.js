@@ -6,7 +6,21 @@
 
 var fs         = require('fs');
 var assert     = require('assert');
+var difflet    = require('difflet')({indent: 2});
 var proto2json = require('../');
+
+// Patch assert.deepEqual
+var originalDeepEqual = assert.deepEqual;
+
+assert.deepEqual = function (actual, expected, message) {
+  try {
+    originalDeepEqual.apply(null, arguments);
+  } catch (err) {
+    var diff = difflet.compare(expected, actual);
+    err.toString = function () { return 'AssertionError: ' + diff; };
+    throw err;
+  }
+};
 
 // Create tests for all fixtures files
 var files = fs.readdirSync(__dirname + '/fixtures')
