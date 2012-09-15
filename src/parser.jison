@@ -54,7 +54,7 @@ file
               message.fields[field.name] = {
                 rule: field.rule,
                 type: field.type,
-                tag:  field.tag
+                tag:  parseInt(field.tag)
               };
             }
           }
