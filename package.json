@@ -1,0 +1,26 @@
+{
+  "name": "proto2json",
+  "version": "0.0.0",
+  "description": "Google Protocol Buffers .proto files to JSON converter",
+  "main": "lib/proto2json.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha tests/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sannis/node-proto2json.git"
+  },
+  "keywords": [
+    "protocol",
+    "buffers",
+    "protobuf",
+    "json",
+    "proto"
+  ],
+  "dependencies": {
+    "jison": "~0.3.12",
+    "mocha": "~1.4.2"
+  },
+  "author": "Oleg Efimov",
+  "license": "MIT"
+}
