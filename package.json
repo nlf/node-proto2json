@@ -4,7 +4,7 @@
   "description": "Google Protocol Buffers .proto files to JSON converter",
   "main": "lib/proto2json.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha tests/test.js"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,8 @@
   ],
   "dependencies": {
     "jison": "~0.3.12",
-    "mocha": "~1.4.2"
+    "mocha": "~1.4.2",
+    "nodelint": "~0.6.2"
   },
   "author": "Oleg Efimov",
   "license": "MIT"
