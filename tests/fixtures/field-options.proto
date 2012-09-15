@@ -1,0 +1,8 @@
+package Test;
+
+message ManyFieldsWithOptions {
+  required bool flag     = 1 [default=true];
+  required int32 number  = 2 [default=1234];
+  required double factor = 3 [default=1.2e-3];
+  required string value  = 4 [default="some string"];
+}

@@ -10,7 +10,7 @@
         },
         "count": {
           "rule": "optional",
-          "type": "int",
+          "type": "int32",
           "tag": 2
         },
         "value": {

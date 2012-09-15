@@ -1,0 +1,33 @@
+{
+  "package": "Test",
+  "messages": {
+    "ManyFieldsWithOptions": {
+      "fields": {
+        "flag": {
+          "rule": "required",
+          "type": "bool",
+          "tag": 1,
+          "default": true
+        },
+        "number": {
+          "rule": "required",
+          "type": "int32",
+          "tag": 2,
+          "default": 1234
+        },
+        "factor": {
+          "rule": "required",
+          "type": "double",
+          "tag": 3,
+          "default": 1.2e-3
+        },
+        "value": {
+          "rule": "required",
+          "type": "string",
+          "tag": 4,
+          "default": "some string"
+        }
+      }
+    }
+  }
+}
