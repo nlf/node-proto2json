@@ -15,14 +15,49 @@ bool   ("true"|"false")
 quote         (['"])
 hex_escape    (\\[Xx][A-Fa-f0-9]{1,2})
 oct_escape    (\\0?[0-7]{1,3})
-char_escape   (\\[abfnrtv\\\?'"])
+char_escape   (\\[abfnrtv\\/'"])
 non_escaped   ([^\0\n])
 
 %{
 parser.protobufCharUnescape = function (chr) {
-  // not yet implemented
+  if (chr[0] !== "\\") {
+    return chr;
+  }
+
+  chr = chr.substr(1);
+
+  var quotes = {
+    '"':  '"',
+    '\'': '\''
+  };
+
+  if (quotes[chr]) {
+    if (chr === parser.protobufCharUnescapeCurrentQuote) {
+      return quotes[chr];
+    } else {
+      return '\\' + quotes[chr];
+    }
+  }
+
+  var escapee = {
+    '\\': '\\',
+    '/':  '/',
+    b:    '\b',
+    f:    '\f',
+    n:    '\n',
+    r:    '\r',
+    t:    '\t',
+    v:    '\v'
+  };
+
+  if (escapee[chr]) {
+    return escapee[chr];
+  }
+
+  chr = String.fromCharCode(chr);
+
   return chr;
-}
+};
 %}
 
 %x INITIAL package message message_body message_field message_field_options string_quoted_content
@@ -79,15 +114,15 @@ parser.protobufCharUnescape = function (chr) {
 <message_field_options>{name}          return 'NAME';
 
 // Quoted string state
-<message_field_options>{quote}         this.begin('string_quoted_content'); return 'QUOTE';
-<string_quoted_content>{quote}         this.popState(); return 'QUOTE';
+<message_field_options>{quote}         this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
 
 // Quoted string state lexems
 <string_quoted_content>\s+             return 'NON_ESCAPED';
-<string_quoted_content>{non_escaped}   return 'NON_ESCAPED';
 <string_quoted_content>{hex_escape}    return 'HEX_ESCAPE';
 <string_quoted_content>{oct_escape}    return 'OCT_ESCAPE';
 <string_quoted_content>{char_escape}   return 'CHAR_ESCAPE';
+<string_quoted_content>{quote}         if (parser.protobufCharUnescapeCurrentQuote === this.match) { this.popState(); return 'QUOTE'; } else { return 'NON_ESCAPED'; }
+<string_quoted_content>{non_escaped}   return 'NON_ESCAPED';
 
 // Skip whitespaces in other states
 <*>\s+  /* skip whitespaces */
