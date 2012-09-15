@@ -7,7 +7,7 @@ Node-proto2json [![Build status][Build status image]][Build status URL]
 
 Check out the [Github repo] for the source code.
 
-[Google Protocol Buffers]: http://ubjson.org/
+[Google Protocol Buffers]: https://developers.google.com/protocol-buffers/
 [Node.js]: http://nodejs.org/
 [Build status image]: https://secure.travis-ci.org/Sannis/node-proto2json.png?branch=master
 [Build status URL]: http://travis-ci.org/Sannis/node-proto2json
