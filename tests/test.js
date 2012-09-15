@@ -6,7 +6,7 @@
 
 var fs         = require('fs');
 var assert     = require('assert');
-var difflet    = require('difflet')({indent: 2});
+var difflet    = require('difflet')({indent: 2, comment: true});
 var proto2json = require('../');
 
 // Patch assert.deepEqual
