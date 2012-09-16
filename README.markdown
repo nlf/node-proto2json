@@ -5,14 +5,10 @@ Node-proto2json [![Build status][Build status image]][Build status URL]
 
 **This module has been tested with Node.js versions 0.6.21, 0.8.8 and 0.9.1.**
 
-Check out the [Github repo] for the source code.
-
 [Google Protocol Buffers]: https://developers.google.com/protocol-buffers/
 [Node.js]: http://nodejs.org/
 [Build status image]: https://secure.travis-ci.org/Sannis/node-proto2json.png?branch=master
 [Build status URL]: http://travis-ci.org/Sannis/node-proto2json
-
-[Github repo]: https://github.com/Sannis/node-proto2json
 
 
 Installation
@@ -22,9 +18,10 @@ You can install this module via [npm]:
 
     $> npm install proto2json
 
-Also you can build latest source code from repository, see below.
+Also you can check out the [Github repo] for the source code.
 
 [npm]: https://github.com/isaacs/npm
+[Github repo]: https://github.com/Sannis/node-proto2json
 
 
 Dependencies
