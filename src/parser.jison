@@ -60,7 +60,7 @@ parser.protobufCharUnescape = function (chr) {
 };
 %}
 
-%x INITIAL package message message_body message_field message_field_options string_quoted_content
+%x INITIAL package message message_body message_field message_field_options enum enum_body enum_field string_quoted_content
 
 %%
 
@@ -80,12 +80,12 @@ parser.protobufCharUnescape = function (chr) {
 // Message state lexems
 <message>{name}     return 'NAME';
 
-
 // Message body state
 <message>"{"                  this.begin('message_body'); return '{';
 <message_body>"}"             this.popState(); this.popState(); return '}';
 
 // Message body lexems | Message field state
+<message_body>"enum"          this.begin('enum'); return 'ENUM';
 <message_body>{rule}          this.begin('message_field'); return 'RULE';
 <message_field>";"            this.popState(); return ';';
 
@@ -124,6 +124,26 @@ parser.protobufCharUnescape = function (chr) {
 <string_quoted_content>{quote}         if (parser.protobufCharUnescapeCurrentQuote === this.match) { this.popState(); return 'QUOTE'; } else { return 'NON_ESCAPED'; }
 <string_quoted_content>{non_escaped}   return 'NON_ESCAPED';
 
+// Enum state
+<INITIAL>"enum"  this.begin('enum'); return 'ENUM';
+
+// Enum state lexems
+<enum>{name}     return 'NAME';
+
+// Enum body state
+<enum>"{"                  this.begin('enum_body'); return '{';
+<enum_body>"}"             this.popState(); this.popState(); return '}';
+
+// Enum body lexems | Enum field state
+<enum_body>{name}          this.begin('enum_field'); return 'NAME';
+<enum_field>";"            this.popState(); return ';';
+
+// Enum field lexems
+<enum_field>"="            return '=';
+<enum_field>{dec}          return 'DEC';
+<enum_field>{hex}          return 'HEX';
+<enum_field>{oct}          return 'OCT';
+
 // Skip whitespaces in other states
 <*>\s+  /* skip whitespaces */
 
@@ -139,37 +159,71 @@ parser.protobufCharUnescape = function (chr) {
 file
   : file_elements EOF %{
     var result = {
+      enums: {},
       messages: {}
     };
-    var message, field;
+    var _message, _field, _enum, ii, jj, kk;
 
     // Loop over the collected elements
-    for (var i in $$) {
-      if ($$.hasOwnProperty(i)) {
-        if ($$[i].package) {
+    for (ii in $$) {
+      if ($$.hasOwnProperty(ii)) {
+        if ($$[ii].type === 'package') {
           // Package element
-          result.package = $$[i].package;
-        } else {
+          result.package = $$[ii].name;
+        } else if ($$[ii].type === 'enum') {
+          // Enum element
+          _enum = {};
+          for (jj in $$[ii].fields) {
+            if ($$[ii].fields.hasOwnProperty(jj)) {
+              _field = $$[ii].fields[jj];
+              _enum[_field.name] = parseInt(_field.tag);
+            }
+          }
+          result.enums[$$[ii].name] = _enum;
+        } else if ($$[ii].type === 'message') {
           // Message element
-          message = {
+          _message = {
+            enums: {},
             fields: {}
           };
-          for (var j in $$[i].fields) {
-            if ($$[i].fields.hasOwnProperty(j)) {
-              field = $$[i].fields[j];
-              message.fields[field.name] = {
-                rule: field.rule,
-                type: field.type,
-                tag:  parseInt(field.tag)
-              };
-              if (typeof field.default !== 'undefined') {
-                message.fields[field.name].default = field.default;
+          // Loop over message enums
+          for (jj in $$[ii].enums) {
+            if ($$[ii].enums.hasOwnProperty(jj)) {
+              _enum = $$[ii].enums[jj];
+              _message.enums[_enum.name] = {};
+              for (kk in _enum.fields) {
+                if (_enum.fields.hasOwnProperty(kk)) {
+                  _message.enums[_enum.name][_enum.fields[kk].name] = _enum.fields[kk].tag;
+                }
               }
             }
           }
-          result.messages[$$[i].name] = message;
+          // Loop over message fields
+          for (jj in $$[ii].fields) {
+            if ($$[ii].fields.hasOwnProperty(jj)) {
+              _field = $$[ii].fields[jj];
+              _message.fields[_field.name] = {
+                rule: _field.rule,
+                type: _field.type,
+                tag:  parseInt(_field.tag)
+              };
+              if (typeof _field.default !== 'undefined') {
+                _message.fields[_field.name].default = _field.default;
+              }
+            }
+          }
+          // Remove empty enums secrion
+          if (Object.keys(_message.enums).length === 0) {
+            delete _message.enums;
+          }
+          result.messages[$$[ii].name] = _message;
         }
       }
+    }
+
+    // Remove empty enums secrion
+    if (Object.keys(result.enums).length === 0) {
+      delete result.enums;
     }
 
     return result;
@@ -184,46 +238,52 @@ file_elements
 element
   : package
   | message
+  | enum
   ;
 
 package
   : PACKAGE NAME ';' %{
     $$ = {
-      package: $2
+      type: 'package',
+      name: $2
     };
   }%
   ;
 
 message
-  : MESSAGE NAME '{' fields '}' %{
+  : MESSAGE NAME '{' message_body '}' %{
     $$ = {
+      type: 'message',
       name: $2,
-      fields: $4
+      enums: $4.enums,
+      fields: $4.fields
     };
   }%
   ;
 
-fields
-  : field { $$ = [$1]; }
-  | fields field { $$ = $1; $$.push($2); }
+message_body
+  : /* empty */ { $$ = {enums: [], fields: []}; }
+  | message_body enum { $$ = $1; $$.enums.push($2); }
+  | message_body message_field { $$ = $1; $$.fields.push($2); }
   ;
 
-field
-  : RULE field_type NAME '=' int field_options ';' %{
-    $$ = {};
-    $$.rule = $1;
-    $$.type = $2;
-    $$.name = $3;
-    $$.tag  = $5;
+message_field
+  : RULE message_field_type NAME '=' int message_field_options ';' %{
+    $$ = {
+      rule: $1,
+      type: $2,
+      name: $3,
+      tag : $5
+    };
     if ($6) {
-      if ($6.default) {
+      if (typeof $6.default !== 'undefined') {
         $$.default = $6.default;
       }
     }
   }%
   ;
 
-field_type
+message_field_type
   : NAME { $$ = $1; }
   ;
 
@@ -233,21 +293,21 @@ int
   | OCT
   ;
 
-field_options
+message_field_options
   : /* empty */
-  | '[' field_options_list ']' { $$ = $2; }
+  | '[' message_field_options_list ']' { $$ = $2; }
   ;
 
-field_options_list
-  : field_option { $$ = {}; for (var i in $1) $$[i] = $1[i]; }
-  | field_options_list ',' field_option { for (var i in $3) $$[i] = $3[i]; }
+message_field_options_list
+  : message_field_option { $$ = {}; for (var i in $1) $$[i] = $1[i]; }
+  | message_field_options_list ',' message_field_option { for (var i in $3) $$[i] = $3[i]; }
   ;
 
-field_option
-  : field_option_default { $$ = $1; }
+message_field_option
+  : message_field_option_default { $$ = $1; }
   ;
 
-field_option_default
+message_field_option_default
   : DEFAULT '=' constant { $$ = {default: $3}; }
   ;
 
@@ -274,4 +334,27 @@ string_quoted_char
   | CHAR_ESCAPE  { $$ = parser.protobufCharUnescape($1); }
   | NON_ESCAPED  { $$ = $1; }
   | NAME         { $$ = $1; } /* because it is valid char sequence and may be matched here*/
+  ;
+
+enum
+  : ENUM NAME '{' enum_fields '}' %{
+    $$ = {
+      type: 'enum',
+      name: $2,
+      fields: $4
+    };
+  }%
+  ;
+
+enum_fields
+  : enum_field { $$ = [$1]; }
+  | enum_fields enum_field { $$ = $1; $$.push($2); }
+  ;
+
+enum_field
+  : NAME '=' int ';' %{
+    $$ = {};
+    $$.name = $1;
+    $$.tag  = $3;
+  }%
   ;

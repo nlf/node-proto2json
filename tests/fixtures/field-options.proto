@@ -6,4 +6,5 @@ message ManyFieldsWithOptions {
   required double factor = 3 [default=1.2e-3];
   required string value  = 4 [default='some\\\'"string'];
   required string omgst  = 5 [default="a\tb\"c\'d\/e\f\\g"];
+  required bool flag2    = 6 [default=false];
 }
