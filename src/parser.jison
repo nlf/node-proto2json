@@ -1,22 +1,5 @@
-// Google Protocol Buffers .proto files grammar
+// Google Protocol Buffers .proto files FLEX grammar
 // Based on https://groups.google.com/forum/#!topic/protobuf/HMz8YkzWEto
-
-%lex
-
-rule  ("required"|"optional"|"repeated")
-name  ([A-Za-z_][A-Za-z0-9_]*)
-
-dec    ([1-9][0-9]*)
-hex    (0[xX][A-Fa-f0-9]+)
-oct    (0[0-7]+)
-float  (\d+(\.\d+)?([Ee][\+-]?\d+)?)
-bool   ("true"|"false")
-
-quote         (['"])
-hex_escape    (\\[Xx][A-Fa-f0-9]{1,2})
-oct_escape    (\\0?[0-7]{1,3})
-char_escape   (\\[abfnrtv\\/'"])
-non_escaped   ([^\0\n])
 
 %{
 parser.protobufCharUnescape = function (chr) {
