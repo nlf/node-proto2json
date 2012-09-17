@@ -27,15 +27,22 @@ var files = fs.readdirSync(__dirname + '/fixtures')
               .filter(function(file) { return file.match(/\.proto$/); })
               .sort();
 
-describe('proto2json', function(){
-  files.forEach(function(file) {
+describe('parser.jison', function () {
+  it('should be parsable', function () {
+    var jison_source = fs.readFileSync(__dirname + '/../src/parser.jison', 'utf8');
+
+    assert.doesNotThrow(function () {
+      require("jison/lib/jison/bnf").parse(jison_source);
+    });
+  });
+});
+
+describe('proto2json', function () {
+  files.forEach(function (file) {
     var name = file.replace(/\.proto$/, '');
 
-    var file_proto = __dirname + '/fixtures/' + name + '.proto';
-    var file_json  = __dirname + '/fixtures/' + name + '.json';
-
-    var proto = fs.readFileSync(file_proto, 'utf8');
-    var json  = fs.readFileSync(file_json, 'utf8');
+    var proto = fs.readFileSync(__dirname + '/fixtures/' + name + '.proto', 'utf8');
+    var json  = fs.readFileSync(__dirname + '/fixtures/' + name + '.json',  'utf8');
 
     json = JSON.parse(json);
 
