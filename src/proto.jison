@@ -65,7 +65,7 @@ parser.protobufCharUnescape = function (chr) {
 %%
 
 // End of file match
-<*><<EOF>>  return 'EOF'
+<*><<EOF>>          return 'EOF';
 
 // Package state
 <INITIAL>"package"  this.begin('package'); return 'PACKAGE';
@@ -86,6 +86,7 @@ parser.protobufCharUnescape = function (chr) {
 
 // Message body lexems | Message field state
 <message_body>"enum"          this.begin('enum'); return 'ENUM';
+<message_body>"message"       this.begin('message'); return 'MESSAGE';
 <message_body>{rule}          this.begin('message_field'); return 'RULE';
 <message_field>";"            this.popState(); return ';';
 
@@ -186,14 +187,16 @@ message
       type: 'message',
       name: $2,
       enums: $4.enums,
+      messages: $4.messages,
       fields: $4.fields
     };
   }%
   ;
 
 message_body
-  : /* empty */ { $$ = {enums: [], fields: []}; }
+  : /* empty */ { $$ = {enums: [], messages: [], fields: []}; }
   | message_body enum { $$ = $1; $$.enums.push($2); }
+  | message_body message { $$ = $1; $$.messages.push($2); }
   | message_body message_field { $$ = $1; $$.fields.push($2); }
   ;
 
