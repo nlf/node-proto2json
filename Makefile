@@ -1,7 +1,7 @@
 
 parser: lib/parser.js
 
-lib/parser.js: src/parser.jison
+lib/parser.js: src/proto.jison
 		./node_modules/.bin/jison $< -o $@
 
 test:

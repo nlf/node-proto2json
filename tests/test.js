@@ -27,9 +27,9 @@ var files = fs.readdirSync(__dirname + '/fixtures')
               .filter(function(file) { return file.match(/\.proto$/); })
               .sort();
 
-describe('parser.jison', function () {
+describe('proto.jison', function () {
   it('should be parsable', function () {
-    var jison_source = fs.readFileSync(__dirname + '/../src/parser.jison', 'utf8');
+    var jison_source = fs.readFileSync(__dirname + '/../src/proto.jison', 'utf8');
 
     assert.doesNotThrow(function () {
       require("jison/lib/jison/bnf").parse(jison_source);
