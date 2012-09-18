@@ -38,11 +38,9 @@ Contributing
 To contribute any patches, simply fork this repository using GitHub
 and send a pull request to [me](https://github.com/Sannis). Thanks!
 
-All information about development use and contribution is placed in the [DEVELOPMENT] file.
+All information about contribution and development use is placed in the [CONTRIBUTING] file.
 
-[Full contributors list](https://github.com/Sannis/node-proto2json/contributors).
-
-[DEVELOPMENT]: https://github.com/Sannis/node-proto2json/blob/master/DEVELOPMENT.markdown
+[CONTRIBUTING]: https://github.com/Sannis/node-proto2json/blob/master/CONTRIBUTING.markdown
 
 
 License
