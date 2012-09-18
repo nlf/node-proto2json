@@ -60,7 +60,7 @@ parser.protobufCharUnescape = function (chr) {
 };
 %}
 
-%x INITIAL package message message_body message_field message_field_options enum enum_body enum_field string_quoted_content
+%x INITIAL package message message_body message_field message_field_options enum enum_body enum_field string_quoted_content option option_value
 
 %%
 
@@ -86,6 +86,7 @@ parser.protobufCharUnescape = function (chr) {
 
 // Message body lexems | Message field state
 <message_body>"enum"          this.begin('enum'); return 'ENUM';
+<message_body>"option"        this.begin('option'); return 'OPTION';
 <message_body>"message"       this.begin('message'); return 'MESSAGE';
 <message_body>{rule}          this.begin('message_field'); return 'RULE';
 <message_field>";"            this.popState(); return ';';
@@ -113,8 +114,6 @@ parser.protobufCharUnescape = function (chr) {
 <message_field_options>{oct}           return 'OCT';
 <message_field_options>{bool}          return 'BOOL';
 <message_field_options>{name}          return 'NAME';
-
-// Quoted string state
 <message_field_options>{quote}         this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
 
 // Quoted string state lexems
@@ -145,6 +144,21 @@ parser.protobufCharUnescape = function (chr) {
 <enum_field>{hex}          return 'HEX';
 <enum_field>{oct}          return 'OCT';
 
+// Option state
+<INITIAL>"option"          this.begin('option'); return 'OPTION';
+<option_value>";"          this.popState(); this.popState(); return ';';
+
+// Option state lexems
+<option>{name}             return 'NAME';
+<option>"="                this.begin('option_value'); return '=';
+<option_value>{float}      return 'FLOAT';
+<option_value>{dec}        return 'DEC';
+<option_value>{hex}        return 'HEX';
+<option_value>{oct}        return 'OCT';
+<option_value>{bool}       return 'BOOL';
+<option_value>{name}       return 'NAME';
+<option_value>{quote}      this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
+
 // Skip whitespaces in other states
 <*>\s+  /* skip whitespaces */
 
@@ -170,6 +184,7 @@ element
   : package
   | message
   | enum
+  | option
   ;
 
 package
@@ -187,6 +202,7 @@ message
       type: 'message',
       name: $2,
       enums: $4.enums,
+      options: $4.options,
       messages: $4.messages,
       fields: $4.fields
     };
@@ -194,8 +210,9 @@ message
   ;
 
 message_body
-  : /* empty */ { $$ = {enums: [], messages: [], fields: []}; }
+  : /* empty */ { $$ = {enums: [], options: [], messages: [], fields: []}; }
   | message_body enum { $$ = $1; $$.enums.push($2); }
+  | message_body option { $$ = $1; $$.options.push($2); }
   | message_body message { $$ = $1; $$.messages.push($2); }
   | message_body message_field { $$ = $1; $$.fields.push($2); }
   ;
@@ -289,5 +306,15 @@ enum_field
     $$ = {};
     $$.name = $1;
     $$.tag  = $3;
+  }%
+  ;
+
+option
+  : OPTION NAME '=' constant ';'%{
+    $$ = {
+      type: 'option',
+      name: $2,
+      value: $4
+    };
   }%
   ;
