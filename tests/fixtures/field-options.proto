@@ -7,4 +7,6 @@ message ManyFieldsWithOptions {
   required string value  = 4 [default='some\\\'"string'];
   required string omgst  = 5 [default="a\tb\"c\'d\/e\f\\g"];
   required bool flag2    = 6 [default=false];
+  required bool flag3    = 7 [custom=false];
+  required string two    = 8 [custom1=false,custom2=true];
 }

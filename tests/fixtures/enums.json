@@ -35,13 +35,17 @@
           "rule": "optional",
           "type": "int32",
           "tag": 3,
-          "default": 10
+          "options": {
+            "default": 10
+          }
         },
         "corpus": {
           "rule": "optional",
           "type": "Corpus",
           "tag": 4,
-          "default": "UNIVERSAL"
+          "options": {
+            "default": "UNIVERSAL"
+          }
         }
       }
     },

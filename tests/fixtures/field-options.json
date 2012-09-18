@@ -7,37 +7,66 @@
           "rule": "required",
           "type": "bool",
           "tag": 1,
-          "default": true
+          "options": {
+            "default": true
+          }
         },
         "number": {
           "rule": "required",
           "type": "int32",
           "tag": 2,
-          "default": 1234
+          "options": {
+            "default": 1234
+          }
         },
         "factor": {
           "rule": "required",
           "type": "double",
           "tag": 3,
-          "default": 1.2e-3
+          "options": {
+            "default": 1.2e-3
+          }
         },
         "value": {
           "rule": "required",
           "type": "string",
           "tag": 4,
-          "default": "some\\'\"string"
+          "options": {
+            "default": "some\\'\"string"
+          }
         },
         "omgst": {
           "rule": "required",
           "type": "string",
           "tag": 5,
-          "default": "a\tb\"c\\'d\/e\f\\g"
+          "options": {
+            "default": "a\tb\"c\\'d\/e\f\\g"
+          }
         },
         "flag2": {
           "rule": "required",
           "type": "bool",
           "tag": 6,
-          "default": false
+          "options": {
+            "default": false
+          }
+        },
+        "flag3" : {
+          "rule" : "required",
+          "type" : "bool",
+          "tag" : 7,
+          "options": {
+            "custom": false
+          }
+        },
+        "two" : {
+          "rule" : "required",
+          "type" : "string",
+          "tag" : 8,
+          "options": {
+            "custom1": false,
+            "custom2": true
+          }
         }
       }
     }

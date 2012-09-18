@@ -60,7 +60,9 @@ parser.protobufCharUnescape = function (chr) {
 };
 %}
 
-%x INITIAL package message message_body message_field message_field_options enum enum_body enum_field string_quoted_content option option_value
+%x INITIAL package
+%x message message_body message_field message_field_options message_field_option message_field_option_value
+%x enum enum_body enum_field string_quoted_content option option_value
 
 %%
 
@@ -102,19 +104,20 @@ parser.protobufCharUnescape = function (chr) {
 
 // Message field options state lexems
 <message_field>"["            this.begin('message_field_options'); return '[';
-<message_field_options>"]"    this.popState(); return ']';
+
 
 // Message field options state lexems
-<message_field_options>","             return ',';
-<message_field_options>"default"       return 'DEFAULT';
-<message_field_options>"="             return '=';
-<message_field_options>{float}         return 'FLOAT';
-<message_field_options>{dec}           return 'DEC';
-<message_field_options>{hex}           return 'HEX';
-<message_field_options>{oct}           return 'OCT';
-<message_field_options>{bool}          return 'BOOL';
-<message_field_options>{name}          return 'NAME';
-<message_field_options>{quote}         this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
+<message_field_options>{name}          this.begin('message_field_option'); return 'NAME';
+<message_field_option>"="              this.begin('message_field_option_value'); return '=';
+<message_field_option_value>{float}    return 'FLOAT';
+<message_field_option_value>{dec}      return 'DEC';
+<message_field_option_value>{hex}      return 'HEX';
+<message_field_option_value>{oct}      return 'OCT';
+<message_field_option_value>{bool}     return 'BOOL';
+<message_field_option_value>{name}     return 'NAME';
+<message_field_option_value>{quote}    this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
+<message_field_option_value>","        this.popState(); this.popState(); return ',';
+<message_field_option_value>"]"        this.popState(); this.popState(); this.popState(); return ']';
 
 // Quoted string state lexems
 <string_quoted_content>\s+             return 'NON_ESCAPED';
@@ -218,23 +221,15 @@ message_body
   ;
 
 message_field
-  : RULE message_field_type NAME '=' int message_field_options ';' %{
+  : RULE NAME NAME '=' int message_field_options ';' %{
     $$ = {
       rule: $1,
       type: $2,
       name: $3,
-      tag : $5
+      tag: $5,
+      options: $6
     };
-    if ($6) {
-      if (typeof $6.default !== 'undefined') {
-        $$.default = $6.default;
-      }
-    }
   }%
-  ;
-
-message_field_type
-  : NAME { $$ = $1; }
   ;
 
 int
@@ -244,21 +239,23 @@ int
   ;
 
 message_field_options
-  : /* empty */
+  : /* empty */ { $$ = []; }
   | '[' message_field_options_list ']' { $$ = $2; }
   ;
 
 message_field_options_list
-  : message_field_option { $$ = {}; for (var i in $1) $$[i] = $1[i]; }
-  | message_field_options_list ',' message_field_option { for (var i in $3) $$[i] = $3[i]; }
+  : message_field_option { $$ = [$1]; }
+  | message_field_options_list ',' message_field_option { $$ = $1; $$.push($3); }
   ;
 
 message_field_option
-  : message_field_option_default { $$ = $1; }
-  ;
-
-message_field_option_default
-  : DEFAULT '=' constant { $$ = {default: $3}; }
+  : NAME '=' constant %{
+    $$ = {
+      type: 'option',
+      name: $1,
+      value: $3
+    };
+  }%
   ;
 
 constant
