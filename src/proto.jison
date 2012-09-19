@@ -226,7 +226,7 @@ message_field
       rule: $1,
       type: $2,
       name: $3,
-      tag: $5,
+      tag: parseInt($5),
       options: $6
     };
   }%
@@ -302,7 +302,7 @@ enum_field
   : NAME '=' int ';' %{
     $$ = {};
     $$.name = $1;
-    $$.tag  = $3;
+    $$.tag  = parseInt($3);
   }%
   ;
 

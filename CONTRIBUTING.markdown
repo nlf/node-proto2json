@@ -4,9 +4,8 @@ Contribute to node-proto2json
 
 It is simple to contribute: fork this repository, write some code and tests,
 ensure that tests passes, lint code
-and then snd a pull request to [me](https://github.com/Sannis) on Github. Thanks!
-
-I'll be glad to see your forks and commits in them :)
+and then send a pull request to [me](https://github.com/Sannis) on Github.
+I'll be glad to see your forks and commits in them :) Thanks!
 
 
 Run tests

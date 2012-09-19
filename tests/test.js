@@ -4,6 +4,8 @@
  * See license text in LICENSE file
  */
 
+/*global describe, it*/
+
 var fs         = require('fs');
 var assert     = require('assert');
 var difflet    = require('difflet')({indent: 2, comment: true});
@@ -24,7 +26,7 @@ assert.deepEqual = function (actual, expected, message) {
 
 // Create tests for all fixtures files
 var files = fs.readdirSync(__dirname + '/fixtures')
-              .filter(function(file) { return file.match(/\.proto$/); })
+              .filter(function (file) { return file.match(/\.proto$/); })
               .sort();
 
 describe('proto.jison', function () {
