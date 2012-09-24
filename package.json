@@ -3,6 +3,9 @@
   "version": "0.1.0beta1",
   "description": "Google Protocol Buffers .proto files to JSON converter",
   "main": "lib/proto2json.js",
+  "bin": {
+    "proto2json" : "./bin/proto2json.js"
+  },
   "scripts": {
     "test": "make test"
   },
@@ -18,6 +21,7 @@
     "proto"
   ],
   "dependencies": {
+    "argparse": "~0.1.6",
     "jison": "~0.3.12",
     "mocha": "~1.4.2",
     "difflet": "~0.2.2",
