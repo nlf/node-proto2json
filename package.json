@@ -1,6 +1,6 @@
 {
   "name": "proto2json",
-  "version": "0.1.0beta1",
+  "version": "0.1.0",
   "description": "Google Protocol Buffers .proto files to JSON converter",
   "main": "lib/proto2json.js",
   "bin": {
