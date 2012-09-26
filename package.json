@@ -21,7 +21,9 @@
     "proto"
   ],
   "dependencies": {
-    "argparse": "~0.1.6",
+    "argparse": "~0.1.6"
+  },
+  "devDependencies": {
     "jison": "~0.3.12",
     "mocha": "~1.4.2",
     "difflet": "~0.2.2",
