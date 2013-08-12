@@ -5,6 +5,7 @@
 
 rule  ("required"|"optional"|"repeated")
 name  ([A-Za-z_][A-Za-z0-9_]*)
+import_name ([A-Za-z0-9\-_\/\.]+)
 
 dec    ([1-9][0-9]*)
 hex    (0[xX][A-Fa-f0-9]+)
@@ -60,7 +61,7 @@ parser.protobufCharUnescape = function (chr) {
 };
 %}
 
-%x INITIAL package
+%x INITIAL package import
 %x message message_body message_field message_field_options message_field_option message_field_option_value
 %x enum enum_body enum_field string_quoted_content option option_value
 
@@ -68,6 +69,12 @@ parser.protobufCharUnescape = function (chr) {
 
 // End of file match
 <*><<EOF>>          return 'EOF';
+
+// Import state
+<INITIAL>"import"   this.begin('import'); return 'IMPORT';
+<import>";"         this.popState(); return ';';
+<import>{import_name} return 'NAME';
+<import>{quote}      this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
 
 // Package state
 <INITIAL>"package"  this.begin('package'); return 'PACKAGE';
@@ -162,6 +169,22 @@ parser.protobufCharUnescape = function (chr) {
 <option_value>{name}       return 'NAME';
 <option_value>{quote}      this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
 
+"/*"(.|\r|\n)*?"*/" %{
+                        if (yytext.match(/\r|\n/) && parser.restricted) {
+                            parser.restricted = false;
+                            this.unput(yytext);
+                            return ";";
+                        }
+                    %}
+
+<*>"//".*($|\r|\n) %{
+                            if (yytext.match(/\r|\n/) && parser.restricted) {
+                                parser.restricted = false;
+                                this.unput(yytext);
+                                return ";";
+                            }
+                        %}
+
 // Skip whitespaces in other states
 <*>\s+  /* skip whitespaces */
 
@@ -185,6 +208,7 @@ file_elements
 
 element
   : package
+  | import
   | message
   | enum
   | option
@@ -194,6 +218,15 @@ package
   : PACKAGE NAME ';' %{
     $$ = {
       type: 'package',
+      name: $2
+    };
+  }%
+  ;
+
+import
+  : IMPORT constant ';' %{
+    $$ = {
+      type: 'import',
       name: $2
     };
   }%
