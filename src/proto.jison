@@ -169,7 +169,7 @@ parser.protobufCharUnescape = function (chr) {
 <option_value>{name}       return 'NAME';
 <option_value>{quote}      this.begin('string_quoted_content'); parser.protobufCharUnescapeCurrentQuote = this.match; return 'QUOTE';
 
-"/*"(.|\r|\n)*?"*/" %{
+<*>"/*"(.|\r|\n)*?"*/" %{
                         if (yytext.match(/\r|\n/) && parser.restricted) {
                             parser.restricted = false;
                             this.unput(yytext);
