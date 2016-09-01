@@ -1,0 +1,19 @@
+package Test;
+
+message MixedNumbers {
+  optional float a = 1 [default = 2];
+  optional float b = 2 [default = -2];
+  optional float c = 3 [default = 2.0];
+  optional float d = 4 [default = -2.0];
+  optional float e = 5 [default = .2];
+  optional float f = 6 [default = -.2];
+  optional float g = 7 [default = 1337.666];
+  optional float h = 8 [default = -1337.666];
+}
+
+message MixedStrings {
+  optional string a = 1 [default = ''];
+  optional string b = 2 [default = ""];
+  optional string c = 3 [default = "Word"];
+  optional string d = 4 [default = 'Word'];
+}

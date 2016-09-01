@@ -1,0 +1,109 @@
+{
+  "messages": {
+    "MixedNumbers": {
+      "fields": {
+        "a": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 1,
+          "options": {
+            "default": 2
+          }
+        },
+        "b": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 2,
+          "options": {
+            "default": -2
+          }
+        },
+        "c": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 3,
+          "options": {
+            "default": 2
+          }
+        },
+        "d": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 4,
+          "options": {
+            "default": -2
+          }
+        },
+        "e": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 5,
+          "options": {
+            "default": 0.2
+          }
+        },
+        "f": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 6,
+          "options": {
+            "default": -0.2
+          }
+        },
+        "g": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 7,
+          "options": {
+            "default": 1337.666
+          }
+        },
+        "h": {
+          "rule": "optional",
+          "type": "float",
+          "tag": 8,
+          "options": {
+            "default": -1337.666
+          }
+        }
+      }
+    },
+    "MixedStrings": {
+      "fields": {
+        "a": {
+          "rule": "optional",
+          "type": "string",
+          "tag": 1,
+          "options": {
+            "default": ""
+          }
+        },
+        "b": {
+          "rule": "optional",
+          "type": "string",
+          "tag": 2,
+          "options": {
+            "default": ""
+          }
+        },
+        "c": {
+          "rule": "optional",
+          "type": "string",
+          "tag": 3,
+          "options": {
+            "default": "Word"
+          }
+        },
+        "d": {
+          "rule": "optional",
+          "type": "string",
+          "tag": 4,
+          "options": {
+            "default": "Word"
+          }
+        }
+      }
+    }
+  },
+  "package": "Test"
+}
